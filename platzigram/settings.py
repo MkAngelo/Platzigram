@@ -26,7 +26,7 @@ SECRET_KEY = os.getenv('PLATZIGRAM_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -54,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'platzigram.middleware.ProfileCompletionMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'platzigram.urls'
@@ -82,15 +83,22 @@ WSGI_APPLICATION = 'platzigram.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': os.getenv('PLATZIGRAM_NAME'),
+#         'USER': os.getenv('PLATZIGRAM_USER'),
+#         'PASSWORD': os.getenv('PLATZIGRAM_PASSWORD'),
+#         'HOST': os.getenv('PLATZIGRAM_HOST'),
+#         'PORT': os.getenv('PLATZIGRAM_PORT'),
+#     }
+# }
+import dj_database_url
+from decouple import config 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.getenv('PLATZIGRAM_NAME'),
-        'USER': os.getenv('PLATZIGRAM_USER'),
-        'PASSWORD': os.getenv('PLATZIGRAM_PASSWORD'),
-        'HOST': os.getenv('PLATZIGRAM_HOST'),
-        'PORT': os.getenv('PLATZIGRAM_PORT'),
-    }
+    'default':dj_database_url.config(
+        default=config('DATABASE_URL')
+    )
 }
 
 
@@ -130,6 +138,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
+STATIC_ROOT = os.path.join(BASE_DIR,'staticfiles')
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR,'static'),
@@ -149,3 +158,4 @@ LOGOUT_REDIRECT_URL = LOGIN_URL
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
